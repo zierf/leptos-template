@@ -20,9 +20,9 @@ leptosfmt src/**/*.rs
 trunk serve
 ```
 
-Open [http://localhost:1420](http://localhost:1420/)
+Open [http://localhost:1420](http://localhost:1420/) to test the app.
 
-## Serve Tauri App
+## Serve Tauri-App
 
 ```SH
 cargo tauri dev
