@@ -14,8 +14,18 @@ struct GreetArgs<'a> {
     name: &'a str,
 }
 
+#[derive(Clone, Debug, Default)]
+struct GlobalState {
+    count: i32,
+    name: String
+}
+
 #[component]
 pub fn App() -> impl IntoView {
+    provide_context(create_rw_signal(GlobalState::default()));
+
+    let state = expect_context::<RwSignal<GlobalState>>();
+
     view! {
         <main class="container">
             <div class="row">
@@ -29,9 +39,21 @@ pub fn App() -> impl IntoView {
 
             <p>"Click on the Tauri and Leptos logos to learn more."</p>
 
+            <p>{move || state.with(|state| format!("{:?}", state))}</p>
+
             <Router>
+                <nav>
+                    <a href="/">"Home"</a>
+                    " | "
+                    <a href="/count">"Counter"</a>
+                    " | "
+                    <a href="/doesnotexist">"Unavailable"</a>
+                </nav>
+                <br />
                 <Routes>
                     <Route path="/" view=Greeter />
+                    <Route path="/count" view=Counter />
+                    <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> } />
                 </Routes>
             </Router>
         </main>
@@ -40,7 +62,18 @@ pub fn App() -> impl IntoView {
 
 #[component]
 pub fn Greeter() -> impl IntoView {
-    let (name, set_name) = create_signal(String::new());
+    let state = expect_context::<RwSignal<GlobalState>>();
+
+    // `create_slice` lets us create a "lens" into the data
+    let (name, set_name) = create_slice(
+        // we take a slice *from* `state`
+        state,
+        // our getter returns a "slice" of the data
+        |state| state.name.clone(),
+        // our setter describes how to mutate that slice, given a new value
+        |state, n| state.name = n,
+    );
+
     let (greet_msg, set_greet_msg) = create_signal(String::new());
 
     let update_name = move |ev| {
@@ -57,20 +90,62 @@ pub fn Greeter() -> impl IntoView {
             }
 
             let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &name }).unwrap();
-            // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+            // Learn more about Tauri commands at https://v2.tauri.app/develop/calling-rust/
             let new_msg = invoke("greet", args).await.as_string().unwrap();
             set_greet_msg(new_msg);
         });
     };
 
     view! {
+        <div>"Current Name: \"" {move || name()} "\""</div>
+
         <form class="row" on:submit=greet>
-            <input id="greet-input" placeholder="Enter a name …" on:input=update_name />
+            <input
+                id="greet-input"
+                placeholder="Enter a name …"
+                on:input=update_name
+                value=name()
+            />
             <button type="submit">"Greet"</button>
         </form>
 
         <p>
             <b>{move || greet_msg()}</b>
         </p>
+    }
+}
+
+#[component]
+fn Counter() -> impl IntoView {
+    let state = expect_context::<RwSignal<GlobalState>>();
+
+    // `create_slice` lets us create a "lens" into the data
+    let (count, set_count) = create_slice(
+        // we take a slice *from* `state`
+        state,
+        // our getter returns a "slice" of the data
+        |state| state.count,
+        // our setter describes how to mutate that slice, given a new value
+        |state, n| state.count = n,
+    );
+
+    let double_count = Signal::derive(move || count.get() * 2);
+    let memoized_triple_count = create_memo(move |_| count.get() * 3);
+
+    view! {
+        <div>
+            <div>"Count is: " {count}</div>
+            <div>"Double-Count: " {double_count}</div>
+            <div>"Triple-Count: " {memoized_triple_count}</div>
+
+            <br />
+
+            <button on:click=move |_| {
+                set_count(count() + 1);
+            }>"+"</button>
+            <button on:click=move |_| {
+                set_count(count() - 1);
+            }>"-"</button>
+        </div>
     }
 }
