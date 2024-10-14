@@ -1,0 +1,12 @@
+# Leptos
+/dist/
+
+# Rust
+/target/
+
+# rustfmt
+**/*.rs.bk
+
+# Nix
+/result
+.direnv
