@@ -1,5 +1,5 @@
-use leptos::leptos_dom::ev::SubmitEvent;
-use leptos::*;
+use leptos::{leptos_dom::ev::SubmitEvent, *};
+use leptos_router::*;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -16,6 +16,30 @@ struct GreetArgs<'a> {
 
 #[component]
 pub fn App() -> impl IntoView {
+    view! {
+        <main class="container">
+            <div class="row">
+                <a href="https://tauri.app" target="_blank">
+                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo" />
+                </a>
+                <a href="https://docs.rs/leptos/" target="_blank">
+                    <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo" />
+                </a>
+            </div>
+
+            <p>"Click on the Tauri and Leptos logos to learn more."</p>
+
+            <Router>
+                <Routes>
+                    <Route path="/" view=Greeter />
+                </Routes>
+            </Router>
+        </main>
+    }
+}
+
+#[component]
+pub fn Greeter() -> impl IntoView {
     let (name, set_name) = create_signal(String::new());
     let (greet_msg, set_greet_msg) = create_signal(String::new());
 
@@ -40,26 +64,13 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <main class="container">
-            <div class="row">
-                <a href="https://tauri.app" target="_blank">
-                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo" />
-                </a>
-                <a href="https://docs.rs/leptos/" target="_blank">
-                    <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo" />
-                </a>
-            </div>
+        <form class="row" on:submit=greet>
+            <input id="greet-input" placeholder="Enter a name …" on:input=update_name />
+            <button type="submit">"Greet"</button>
+        </form>
 
-            <p>"Click on the Tauri and Leptos logos to learn more."</p>
-
-            <form class="row" on:submit=greet>
-                <input id="greet-input" placeholder="Enter a name …" on:input=update_name />
-                <button type="submit">"Greet"</button>
-            </form>
-
-            <p>
-                <b>{move || greet_msg()}</b>
-            </p>
-        </main>
+        <p>
+            <b>{move || greet_msg()}</b>
+        </p>
     }
 }
