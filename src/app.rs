@@ -21,7 +21,7 @@ pub fn App() -> impl IntoView {
 
     let update_name = move |ev| {
         let v = event_target_value(&ev);
-        set_name.set(v);
+        set_name(v);
     };
 
     let greet = move |ev: SubmitEvent| {
@@ -35,7 +35,7 @@ pub fn App() -> impl IntoView {
             let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &name }).unwrap();
             // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
             let new_msg = invoke("greet", args).await.as_string().unwrap();
-            set_greet_msg.set(new_msg);
+            set_greet_msg(new_msg);
         });
     };
 
@@ -58,7 +58,7 @@ pub fn App() -> impl IntoView {
             </form>
 
             <p>
-                <b>{move || greet_msg.get()}</b>
+                <b>{move || greet_msg()}</b>
             </p>
         </main>
     }
