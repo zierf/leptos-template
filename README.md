@@ -27,3 +27,18 @@ Open [http://localhost:1420](http://localhost:1420/) to test the app.
 ```SH
 cargo tauri dev
 ```
+
+## Build Web-App
+
+```SH
+trunk build --release
+```
+
+Built files are stored in the `dist` folder.
+
+
+## Build Tauri-App
+
+```SH
+cargo tauri build
+```
