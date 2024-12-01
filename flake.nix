@@ -25,16 +25,24 @@
         # $> nix develop
         devShells = {
           # https://v2.tauri.app/start/prerequisites/#linux
-          default = pkgs.mkShell {
+          default = pkgs.mkShell rec {
             buildInputs = with pkgs; [
               at-spi2-atk
               atkmm
               cairo
               curl
+              ffmpeg
               gdk-pixbuf
               glib
               gobject-introspection
               gobject-introspection.dev
+              gst_all_1.gstreamer
+              gst_all_1.gst-libav
+              gst_all_1.gst-vaapi
+              gst_all_1.gst-plugins-base
+              gst_all_1.gst-plugins-good
+              gst_all_1.gst-plugins-bad
+              gst_all_1.gst-plugins-ugly
               gtk3
               harfbuzz
               librsvg
@@ -57,6 +65,8 @@
               cargo install trunk --locked
 
               cargo install leptosfmt
+
+              export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath buildInputs}:$LD_LIBRARY_PATH
             '';
           };
         };

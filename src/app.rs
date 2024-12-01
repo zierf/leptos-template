@@ -7,8 +7,9 @@ use wasm_bindgen::prelude::*;
 
 mod counter;
 mod greeter;
+mod multimedia;
 
-use self::{counter::Counter, greeter::Greeter};
+use self::{counter::Counter, greeter::Greeter, multimedia::Multimedia};
 
 #[wasm_bindgen]
 extern "C" {
@@ -86,12 +87,15 @@ pub fn App() -> impl IntoView {
                     " | "
                     <a href="/count">"Counter"</a>
                     " | "
+                    <a href="/media">"Multimedia"</a>
+                    " | "
                     <a href="/doesnotexist">"Unavailable"</a>
                 </nav>
                 <br />
                 <Routes>
                     <Route path="/" view=Greeter />
                     <Route path="/count" view=Counter />
+                    <Route path="/media" view=Multimedia />
                     <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> } />
                 </Routes>
             </Router>
