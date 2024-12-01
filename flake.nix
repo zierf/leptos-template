@@ -30,6 +30,7 @@
               at-spi2-atk
               atkmm
               cairo
+              curl
               gdk-pixbuf
               glib
               gobject-introspection
